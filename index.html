@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Skybox</title>
+</head>
+
+<body>
+	<header>
+		<h1>Skybox</h1>
+		<div>Creating a skybox and panning the camera to look around.</div>
+
+		<style>
+			body {
+				background-image: url("images/sky.jpg");
+			}
+		</style>
+		
+		
+	</header>
+
+	<script src="js/three.min.js"></script>
+	<script>
+		var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera(75, 1500 / 700, 0.1, 1000);
+
+		var renderer = new THREE.WebGLRenderer();
+		renderer.setSize(1500, 700);
+		document.body.appendChild(renderer.domElement);
+
+		//Loading cube textures
+		var urlPrefix = "images/Bridge2/";
+		var urls = [urlPrefix + "posx.jpg", urlPrefix + "negx.jpg", urlPrefix + "posy.jpg", urlPrefix + "negy.jpg", urlPrefix + "posz.jpg", urlPrefix + "negz.jpg"];
+		var textureCube = THREE.ImageUtils.loadTextureCube(urls);
+
+		//Initialising shaders
+		var shader = THREE.ShaderLib["cube"];
+		shader.uniforms["tCube"].value = textureCube;
+		var material = new THREE.ShaderMaterial({
+			fragmentShader: shader.fragmentShader,
+			vertexShader: shader.vertexShader,
+			uniforms: shader.uniforms,
+			side: THREE.BackSide
+		});
+
+		//Build the skyboxMesh
+		var geometry = new THREE.BoxGeometry(2000, 2000, 2000);
+		var skyboxMesh = new THREE.Mesh(geometry, material);
+		scene.add(skyboxMesh);
+
+		var render = function () {
+			requestAnimationFrame(render);
+
+			//Move the camera based on a timer
+			var timer = - new Date().getTime() * 0.0005; 
+			camera.position.x = 200 * Math.cos(timer);
+
+			renderer.render(scene, camera);
+		};
+
+		render();		
+	</script>
+
+	<footer>
+		References: <a href="http://learningthreejs.com/blog/2011/08/15/lets-do-a-sky/">Let's do a Sky</a>
+	<footer>
+</body>
+
+</html>
